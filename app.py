@@ -143,7 +143,7 @@ if st.button("Get Date Range"):
         with st.spinner('Getting date ranges...'):
             try:
                 # Assuming the backend provides a /summary endpoint that includes date ranges
-                date_range_response = requests.get(f"{API_BASE_URL}/summary", params={'session_id': session_id})
+                date_range_response = requests.get(f"{API_BASE_URL}/get_date_range", params={'session_id': session_id})
                 if date_range_response.status_code == 200:
                     date_ranges = date_range_response.json()
                     st.session_state['date_ranges'] = date_ranges
