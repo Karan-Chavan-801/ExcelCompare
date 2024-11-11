@@ -221,13 +221,13 @@ if st.session_state['data_processed']:
                 st.markdown("### Key Metrics")
                 col1, col2, col3 = st.columns(3)
                 with col1:
-                    st.metric(label="Total Amount (API)", value=f"${summary.get('total_amount_api', 0):,.2f}")
+                    st.metric(label="Total Amount (API)", value=f"₹{summary.get('total_amount_api', 0):,.2f}")
                 with col2:
-                    st.metric(label="Total Amount (Dashboard)", value=f"${summary.get('total_amount_dashboard', 0):,.2f}")
+                    st.metric(label="Total Amount (Dashboard)", value=f"₹{summary.get('total_amount_dashboard', 0):,.2f}")
                 with col3:
                     amount_diff = summary.get('total_amount_difference', 0)
                     delta_color = "normal" if amount_diff >= 0 else "inverse"
-                    st.metric(label="Amount Difference", value=f"${amount_diff:,.2f}", delta="", delta_color=delta_color)
+                    st.metric(label="Amount Difference", value=f"₹{amount_diff:,.2f}", delta="", delta_color=delta_color)
 
                 col4, col5, col6 = st.columns(3)
                 with col4:
