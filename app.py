@@ -346,61 +346,66 @@ if st.session_state['data_processed']:
         display_data_with_aggrid(session_id, "get_dataframe_dashboard", "Dashboard Data", 'dashboard_pagination')
 
     # ---------------------- Amount Differences ---------------------- #
-    st.header("Amount Differences")
+    # ---------------------- Amount and Status Differences Side by Side ---------------------- #
+    st.header("Differences")
 
-    def display_amount_differences(session_id, pagination_key):
+    # Create two columns: one for Amount Differences and one for Status Differences
+    col1, col2 = st.columns(2)
+
+    with col1:
         st.subheader("Amount Differences")
 
-        # Get current pagination state
-        current_page = st.session_state[pagination_key]['page']
-        page_size = st.session_state[pagination_key]['page_size']
 
-        # Fetch data for current page
-        data_response = fetch_dataframe(session_id, "get_amount_differences", current_page, page_size)
-        if data_response:
-            data = data_response['data']
-            total_records = data_response.get('total_records', 0)
-            total_pages = math.ceil(total_records / page_size) if page_size else 1
-            # Convert to DataFrame
-            df = pd.DataFrame(data)
+        def display_amount_differences(session_id, pagination_key):
+            st.subheader("Amount Differences")
 
-            if df.empty:
-                st.warning("No data available on this page.")
-            else:
-                # Configure AgGrid options
-                gb = GridOptionsBuilder.from_dataframe(df)
-                gb.configure_default_column(resizable=True, filterable=True, sortable=True)
-                grid_options = gb.build()
+            # Get current pagination state
+            current_page = st.session_state[pagination_key]['page']
+            page_size = st.session_state[pagination_key]['page_size']
 
-                # Display AgGrid
-                AgGrid(
-                    df,
-                    gridOptions=grid_options,
-                    height=400,
-                    width='100%',
-                    #fit_columns_on_grid_load=True,
-                    theme='balham',
-                    enable_enterprise_modules=True,
-                    update_mode=GridUpdateMode.NO_UPDATE,
-                    allow_unsafe_jscode=True,
-                )
+            # Fetch data for current page
+            data_response = fetch_dataframe(session_id, "get_amount_differences", current_page, page_size)
+            if data_response:
+                data = data_response['data']
+                total_records = data_response.get('total_records', 0)
+                total_pages = math.ceil(total_records / page_size) if page_size else 1
+                # Convert to DataFrame
+                df = pd.DataFrame(data)
 
-                # Display pagination controls
-                col_prev, col_page, col_next = st.columns([1, 2, 1])
-                with col_prev:
-                    if st.button("Previous", key=f"amount_diff_prev"):
-                        if current_page > 1:
-                            st.session_state[pagination_key]['page'] -= 1
-                with col_page:
-                    st.write(f"Page {current_page} of {total_pages}")
-                with col_next:
-                    if st.button("Next", key=f"amount_diff_next"):
-                        if current_page < total_pages:
-                            st.session_state[pagination_key]['page'] += 1
+                if df.empty:
+                    st.warning("No data available on this page.")
+                else:
+                    # Configure AgGrid options
+                    gb = GridOptionsBuilder.from_dataframe(df)
+                    gb.configure_default_column(resizable=True, filterable=True, sortable=True)
+                    grid_options = gb.build()
 
-    # Display Amount Differences Data
-    col1, col2 = st.columns(2)
-    with col1:
+                    # Display AgGrid
+                    AgGrid(
+                        df,
+                        gridOptions=grid_options,
+                        height=400,
+                        width='100%',
+                        theme='balham',
+                        enable_enterprise_modules=True,
+                        update_mode=GridUpdateMode.NO_UPDATE,
+                        allow_unsafe_jscode=True,
+                    )
+
+                    # Display pagination controls
+                    col_prev, col_page, col_next = st.columns([1, 2, 1])
+                    with col_prev:
+                        if st.button("Previous", key=f"{pagination_key}_prev"):
+                            if current_page > 1:
+                                st.session_state[pagination_key]['page'] -= 1
+                    with col_page:
+                        st.write(f"Page {current_page} of {total_pages}")
+                    with col_next:
+                        if st.button("Next", key=f"{pagination_key}_next"):
+                            if current_page < total_pages:
+                                st.session_state[pagination_key]['page'] += 1
+
+
         # Page Size Selector for Amount Differences
         amount_diff_page_size = st.selectbox(
             "Amount Differences - Rows per page",
@@ -411,62 +416,60 @@ if st.session_state['data_processed']:
         st.session_state['amount_diff_pagination']['page_size'] = amount_diff_page_size
         display_amount_differences(session_id, 'amount_diff_pagination')
 
-    # ---------------------- Status Differences ---------------------- #
-    st.header("Status Differences")
-
-    def display_status_differences(session_id, pagination_key):
+    with col2:
         st.subheader("Status Differences")
 
-        # Get current pagination state
-        current_page = st.session_state[pagination_key]['page']
-        page_size = st.session_state[pagination_key]['page_size']
 
-        # Fetch data for current page
-        data_response = fetch_dataframe(session_id, "get_status_differences", current_page, page_size)
-        if data_response:
-            data = data_response['data']
-            total_records = data_response.get('total_records', 0)
-            total_pages = math.ceil(total_records / page_size) if page_size else 1
-            # Convert to DataFrame
-            df = pd.DataFrame(data)
+        def display_status_differences(session_id, pagination_key):
+            st.subheader("Status Differences")
 
-            if df.empty:
-                st.warning("No data available on this page.")
-            else:
-                # Configure AgGrid options
-                gb = GridOptionsBuilder.from_dataframe(df)
-                gb.configure_default_column(resizable=True, filterable=True, sortable=True)
-                grid_options = gb.build()
+            # Get current pagination state
+            current_page = st.session_state[pagination_key]['page']
+            page_size = st.session_state[pagination_key]['page_size']
 
-                # Display AgGrid
-                AgGrid(
-                    df,
-                    gridOptions=grid_options,
-                    height=400,
-                    width='100%',
-                    fit_columns_on_grid_load=True,
-                    theme='balham',
-                    enable_enterprise_modules=True,
-                    update_mode=GridUpdateMode.NO_UPDATE,
-                    allow_unsafe_jscode=True,
-                )
+            # Fetch data for current page
+            data_response = fetch_dataframe(session_id, "get_status_differences", current_page, page_size)
+            if data_response:
+                data = data_response['data']
+                total_records = data_response.get('total_records', 0)
+                total_pages = math.ceil(total_records / page_size) if page_size else 1
+                # Convert to DataFrame
+                df = pd.DataFrame(data)
 
-                # Display pagination controls
-                col_prev, col_page, col_next = st.columns([1, 2, 1])
-                with col_prev:
-                    if st.button("Previous", key=f"status_diff_prev"):
-                        if current_page > 1:
-                            st.session_state[pagination_key]['page'] -= 1
-                with col_page:
-                    st.write(f"Page {current_page} of {total_pages}")
-                with col_next:
-                    if st.button("Next", key=f"status_diff_next"):
-                        if current_page < total_pages:
-                            st.session_state[pagination_key]['page'] += 1
+                if df.empty:
+                    st.warning("No data available on this page.")
+                else:
+                    # Configure AgGrid options
+                    gb = GridOptionsBuilder.from_dataframe(df)
+                    gb.configure_default_column(resizable=True, filterable=True, sortable=True)
+                    grid_options = gb.build()
 
-    # Display Status Differences Data
-    col1, col2 = st.columns(2)
-    with col1:
+                    # Display AgGrid
+                    AgGrid(
+                        df,
+                        gridOptions=grid_options,
+                        height=400,
+                        width='100%',
+                        theme='balham',
+                        enable_enterprise_modules=True,
+                        update_mode=GridUpdateMode.NO_UPDATE,
+                        allow_unsafe_jscode=True,
+                    )
+
+                    # Display pagination controls
+                    col_prev, col_page, col_next = st.columns([1, 2, 1])
+                    with col_prev:
+                        if st.button("Previous", key=f"{pagination_key}_prev"):
+                            if current_page > 1:
+                                st.session_state[pagination_key]['page'] -= 1
+                    with col_page:
+                        st.write(f"Page {current_page} of {total_pages}")
+                    with col_next:
+                        if st.button("Next", key=f"{pagination_key}_next"):
+                            if current_page < total_pages:
+                                st.session_state[pagination_key]['page'] += 1
+
+
         # Page Size Selector for Status Differences
         status_diff_page_size = st.selectbox(
             "Status Differences - Rows per page",
@@ -476,7 +479,6 @@ if st.session_state['data_processed']:
         )
         st.session_state['status_diff_pagination']['page_size'] = status_diff_page_size
         display_status_differences(session_id, 'status_diff_pagination')
-
     # ---------------------- Fetch and Display Visualizations ---------------------- #
     st.header("Visualizations")
 
@@ -576,6 +578,7 @@ if st.session_state['data_processed']:
     st.markdown(f"[Download Uncommon OrderIDs CSV]({uncommon_orderids_url})")
 
     # ---------------------- Search Functionality ---------------------- #
+
     st.header("Search for OrderID")
 
     orderid_to_search = st.text_input("Enter OrderID to search")
@@ -589,41 +592,45 @@ if st.session_state['data_processed']:
                 )
                 if search_response.status_code == 200:
                     search_results = search_response.json()
-                    st.subheader("API File Matches")
-                    if search_results.get('api_matches'):
-                        api_matches_df = pd.DataFrame(search_results['api_matches'])
-                        gb = GridOptionsBuilder.from_dataframe(api_matches_df)
-                        gb.configure_pagination(paginationAutoPageSize=True)
-                        gb.configure_side_bar()
-                        gb.configure_default_column(resizable=True, min_width=100, wrapText=True, autoHeight=True)
-                        grid_options = gb.build()
-                        AgGrid(
-                            api_matches_df,
-                            gridOptions=grid_options,
-                            height=150,  # Increased height
-                            #fit_columns_on_grid_load=True,
-                            theme='balham'  # Use 'balham' to match dark theme
-                        )
-                    else:
-                        st.write("No matches found in API File.")
 
-                    st.subheader("Dashboard File Matches")
-                    if search_results.get('dashboard_matches'):
-                        dashboard_matches_df = pd.DataFrame(search_results['dashboard_matches'])
-                        gb = GridOptionsBuilder.from_dataframe(dashboard_matches_df)
-                        gb.configure_pagination(paginationAutoPageSize=True)
-                        gb.configure_side_bar()
-                        gb.configure_default_column(resizable=True, min_width=100, wrapText=True, autoHeight=True)
-                        grid_options = gb.build()
-                        AgGrid(
-                            dashboard_matches_df,
-                            gridOptions=grid_options,
-                            height=150,  # Increased height
-                            #fit_columns_on_grid_load=True,
-                            theme='balham'  # Use 'balham' to match dark theme
-                        )
-                    else:
-                        st.write("No matches found in Dashboard File.")
+                    # Create two columns for API Matches and Dashboard Matches
+                    col1, col2 = st.columns(2)
+
+                    with col1:
+                        st.subheader("API File Matches")
+                        if search_results.get('api_matches'):
+                            api_matches_df = pd.DataFrame(search_results['api_matches'])
+                            gb = GridOptionsBuilder.from_dataframe(api_matches_df)
+                            gb.configure_pagination(paginationAutoPageSize=True)
+                            gb.configure_side_bar()
+                            gb.configure_default_column(resizable=True, min_width=100, wrapText=True, autoHeight=True)
+                            grid_options = gb.build()
+                            AgGrid(
+                                api_matches_df,
+                                gridOptions=grid_options,
+                                height=300,  # Adjusted height for better visibility
+                                theme='balham'  # Use 'balham' to match dark theme
+                            )
+                        else:
+                            st.write("No matches found in API File.")
+
+                    with col2:
+                        st.subheader("Dashboard File Matches")
+                        if search_results.get('dashboard_matches'):
+                            dashboard_matches_df = pd.DataFrame(search_results['dashboard_matches'])
+                            gb = GridOptionsBuilder.from_dataframe(dashboard_matches_df)
+                            gb.configure_pagination(paginationAutoPageSize=True)
+                            gb.configure_side_bar()
+                            gb.configure_default_column(resizable=True, min_width=100, wrapText=True, autoHeight=True)
+                            grid_options = gb.build()
+                            AgGrid(
+                                dashboard_matches_df,
+                                gridOptions=grid_options,
+                                height=300,  # Adjusted height for better visibility
+                                theme='balham'  # Use 'balham' to match dark theme
+                            )
+                        else:
+                            st.write("No matches found in Dashboard File.")
                 else:
                     st.error(f"Search failed: {search_response.json().get('detail', '')}")
             except Exception as e:
