@@ -303,7 +303,7 @@ if st.session_state['data_processed']:
                     height=400,  # Adjust height as needed
                     width='100%',
                     #fit_columns_on_grid_load=True,
-                    #theme='balham',
+                    theme='balham',
                     enable_enterprise_modules=True,
                     update_mode=GridUpdateMode.NO_UPDATE,
                     allow_unsafe_jscode=True,
@@ -379,7 +379,7 @@ if st.session_state['data_processed']:
                     height=400,
                     width='100%',
                     #fit_columns_on_grid_load=True,
-                    #theme='balham',
+                    theme='balham',
                     enable_enterprise_modules=True,
                     update_mode=GridUpdateMode.NO_UPDATE,
                     allow_unsafe_jscode=True,
@@ -602,7 +602,7 @@ if st.session_state['data_processed']:
                             gridOptions=grid_options,
                             height=150,  # Increased height
                             #fit_columns_on_grid_load=True,
-                            #theme='balham'  # Use 'balham' to match dark theme
+                            theme='balham'  # Use 'balham' to match dark theme
                         )
                     else:
                         st.write("No matches found in API File.")
@@ -620,7 +620,7 @@ if st.session_state['data_processed']:
                             gridOptions=grid_options,
                             height=150,  # Increased height
                             #fit_columns_on_grid_load=True,
-                            #theme='balham'  # Use 'balham' to match dark theme
+                            theme='balham'  # Use 'balham' to match dark theme
                         )
                     else:
                         st.write("No matches found in Dashboard File.")
