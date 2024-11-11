@@ -8,6 +8,7 @@ from io import BytesIO
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 import plotly.express as px
 import math
+import streamlit.components.v1 as components
 
 # ---------------------- Configuration ---------------------- #
 
