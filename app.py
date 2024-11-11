@@ -225,7 +225,7 @@ if st.session_state['data_processed']:
                 with col2:
                     st.metric(label="Total Amount (Dashboard)", value=f"${summary.get('total_amount_dashboard', 0):,.2f}")
                 with col3:
-                    amount_diff = summary.get('total_amount_api', 0) - summary.get('total_amount_dashboard', 0)
+                    amount_diff = summary.get('total_amount_difference', 0)
                     delta_color = "normal" if amount_diff >= 0 else "inverse"
                     st.metric(label="Amount Difference", value=f"${amount_diff:,.2f}", delta="", delta_color=delta_color)
 
