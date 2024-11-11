@@ -581,56 +581,56 @@ if st.session_state['data_processed']:
    # ---------------------- Search Functionality ---------------------- #
     st.header("Search for OrderID")
     
-        orderid_to_search = st.text_input("Enter OrderID to search")
-    
-        if st.button("Search") and orderid_to_search:
-            with st.spinner("Searching..."):
-                try:
-                    search_response = requests.get(
-                        f"{API_BASE_URL}/search",
-                        params={'session_id': session_id, 'orderid': orderid_to_search}
-                    )
-                    if search_response.status_code == 200:
-                        search_results = search_response.json()
-                        st.subheader("API File Matches")
-                        if search_results.get('api_matches'):
-                            api_matches_df = pd.DataFrame(search_results['api_matches'])
-                            gb = GridOptionsBuilder.from_dataframe(api_matches_df)
-                            gb.configure_pagination(paginationAutoPageSize=True)
-                            gb.configure_side_bar()
-                            gb.configure_default_column(resizable=True, min_width=100, wrapText=True, autoHeight=True)
-                            grid_options = gb.build()
-                            AgGrid(
-                                api_matches_df,
-                                gridOptions=grid_options,
-                                height=150,  # Increased height
-                                #fit_columns_on_grid_load=True,
-                                theme='balham'  # Use 'balham' to match dark theme
-                            )
-                        else:
-                            st.write("No matches found in API File.")
-    
-                        st.subheader("Dashboard File Matches")
-                        if search_results.get('dashboard_matches'):
-                            dashboard_matches_df = pd.DataFrame(search_results['dashboard_matches'])
-                            gb = GridOptionsBuilder.from_dataframe(dashboard_matches_df)
-                            gb.configure_pagination(paginationAutoPageSize=True)
-                            gb.configure_side_bar()
-                            gb.configure_default_column(resizable=True, min_width=100, wrapText=True, autoHeight=True)
-                            grid_options = gb.build()
-                            AgGrid(
-                                dashboard_matches_df,
-                                gridOptions=grid_options,
-                                height=150,  # Increased height
-                                #fit_columns_on_grid_load=True,
-                                theme='balham'  # Use 'balham' to match dark theme
-                            )
-                        else:
-                            st.write("No matches found in Dashboard File.")
+    orderid_to_search = st.text_input("Enter OrderID to search")
+
+    if st.button("Search") and orderid_to_search:
+        with st.spinner("Searching..."):
+            try:
+                search_response = requests.get(
+                    f"{API_BASE_URL}/search",
+                    params={'session_id': session_id, 'orderid': orderid_to_search}
+                )
+                if search_response.status_code == 200:
+                    search_results = search_response.json()
+                    st.subheader("API File Matches")
+                    if search_results.get('api_matches'):
+                        api_matches_df = pd.DataFrame(search_results['api_matches'])
+                        gb = GridOptionsBuilder.from_dataframe(api_matches_df)
+                        gb.configure_pagination(paginationAutoPageSize=True)
+                        gb.configure_side_bar()
+                        gb.configure_default_column(resizable=True, min_width=100, wrapText=True, autoHeight=True)
+                        grid_options = gb.build()
+                        AgGrid(
+                            api_matches_df,
+                            gridOptions=grid_options,
+                            height=150,  # Increased height
+                            #fit_columns_on_grid_load=True,
+                            theme='balham'  # Use 'balham' to match dark theme
+                        )
                     else:
-                        st.error(f"Search failed: {search_response.json().get('detail', '')}")
-                except Exception as e:
-                    st.error(f"An error occurred during search: {e}")
+                        st.write("No matches found in API File.")
+
+                    st.subheader("Dashboard File Matches")
+                    if search_results.get('dashboard_matches'):
+                        dashboard_matches_df = pd.DataFrame(search_results['dashboard_matches'])
+                        gb = GridOptionsBuilder.from_dataframe(dashboard_matches_df)
+                        gb.configure_pagination(paginationAutoPageSize=True)
+                        gb.configure_side_bar()
+                        gb.configure_default_column(resizable=True, min_width=100, wrapText=True, autoHeight=True)
+                        grid_options = gb.build()
+                        AgGrid(
+                            dashboard_matches_df,
+                            gridOptions=grid_options,
+                            height=150,  # Increased height
+                            #fit_columns_on_grid_load=True,
+                            theme='balham'  # Use 'balham' to match dark theme
+                        )
+                    else:
+                        st.write("No matches found in Dashboard File.")
+                else:
+                    st.error(f"Search failed: {search_response.json().get('detail', '')}")
+            except Exception as e:
+                st.error(f"An error occurred during search: {e}")
 
     # ---------------------- End Session ---------------------- #
     st.header("End Session")
