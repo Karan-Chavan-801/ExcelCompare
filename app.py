@@ -581,31 +581,20 @@ if st.session_state['data_processed']:
    # ---------------------- Search Functionality ---------------------- #
 st.header("Search for OrderID")
 
-orderid_to_search = st.text_input("Enter OrderID to search")
+    orderid_to_search = st.text_input("Enter OrderID to search")
 
-if st.button("Search") and orderid_to_search:
-    with st.spinner("Searching..."):
-        try:
-            search_response = requests.get(
-                f"{API_BASE_URL}/search",
-                params={'session_id': session_id, 'orderid': orderid_to_search}
-            )
-            if search_response.status_code == 200:
-                search_results = search_response.json()
-                
-                # Create two columns for API Matches and Dashboard Matches
-                col1, col2 = st.columns(2)
-                
-                with col1:
+    if st.button("Search") and orderid_to_search:
+        with st.spinner("Searching..."):
+            try:
+                search_response = requests.get(
+                    f"{API_BASE_URL}/search",
+                    params={'session_id': session_id, 'orderid': orderid_to_search}
+                )
+                if search_response.status_code == 200:
+                    search_results = search_response.json()
                     st.subheader("API File Matches")
                     if search_results.get('api_matches'):
                         api_matches_df = pd.DataFrame(search_results['api_matches'])
-                        # Convert numerical types to native Python types
-                        api_matches_df['OrderID'] = api_matches_df['OrderID'].astype(int)
-                        api_matches_df['Amount_API_Excel_CSV'] = api_matches_df['Amount_API_Excel_CSV'].astype(float)
-                        api_matches_df['Amount_Dashboard_Excel_CSV'] = api_matches_df['Amount_Dashboard_Excel_CSV'].astype(float)
-                        api_matches_df['Difference'] = api_matches_df['Difference'].astype(float)
-                        
                         gb = GridOptionsBuilder.from_dataframe(api_matches_df)
                         gb.configure_pagination(paginationAutoPageSize=True)
                         gb.configure_side_bar()
@@ -614,21 +603,16 @@ if st.button("Search") and orderid_to_search:
                         AgGrid(
                             api_matches_df,
                             gridOptions=grid_options,
-                            height=300,  # Adjusted height for better visibility
+                            height=150,  # Increased height
+                            #fit_columns_on_grid_load=True,
                             theme='balham'  # Use 'balham' to match dark theme
                         )
                     else:
                         st.write("No matches found in API File.")
 
-                with col2:
                     st.subheader("Dashboard File Matches")
                     if search_results.get('dashboard_matches'):
                         dashboard_matches_df = pd.DataFrame(search_results['dashboard_matches'])
-                        # Convert numerical types to native Python types
-                        dashboard_matches_df['OrderID'] = dashboard_matches_df['OrderID'].astype(int)
-                        dashboard_matches_df['Status_API_Excel_CSV'] = dashboard_matches_df['Status_API_Excel_CSV'].astype(str)
-                        dashboard_matches_df['Status_Dashboard_Excel_CSV'] = dashboard_matches_df['Status_Dashboard_Excel_CSV'].astype(str)
-                        
                         gb = GridOptionsBuilder.from_dataframe(dashboard_matches_df)
                         gb.configure_pagination(paginationAutoPageSize=True)
                         gb.configure_side_bar()
@@ -637,15 +621,16 @@ if st.button("Search") and orderid_to_search:
                         AgGrid(
                             dashboard_matches_df,
                             gridOptions=grid_options,
-                            height=300,  # Adjusted height for better visibility
+                            height=150,  # Increased height
+                            #fit_columns_on_grid_load=True,
                             theme='balham'  # Use 'balham' to match dark theme
                         )
                     else:
                         st.write("No matches found in Dashboard File.")
-            else:
-                st.error(f"Search failed: {search_response.json().get('detail', '')}")
-        except Exception as e:
-            st.error(f"An error occurred during search: {e}")
+                else:
+                    st.error(f"Search failed: {search_response.json().get('detail', '')}")
+            except Exception as e:
+                st.error(f"An error occurred during search: {e}")
 
     # ---------------------- End Session ---------------------- #
     st.header("End Session")
