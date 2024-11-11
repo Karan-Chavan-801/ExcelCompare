@@ -600,7 +600,7 @@ if st.session_state['data_processed']:
                         AgGrid(
                             api_matches_df,
                             gridOptions=grid_options,
-                            height=20,  # Increased height
+                            height=100,  # Increased height
                             #fit_columns_on_grid_load=True,
                             #theme='balham'  # Use 'balham' to match dark theme
                         )
@@ -618,7 +618,7 @@ if st.session_state['data_processed']:
                         AgGrid(
                             dashboard_matches_df,
                             gridOptions=grid_options,
-                            height=20,  # Increased height
+                            height=100,  # Increased height
                             #fit_columns_on_grid_load=True,
                             #theme='balham'  # Use 'balham' to match dark theme
                         )
