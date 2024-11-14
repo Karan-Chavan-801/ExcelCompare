@@ -14,6 +14,7 @@ import math
 
 # Replace with your FastAPI backend URL
 API_BASE_URL = 'https://api.demopython.in/'  # Update this if your backend is hosted elsewhere
+st.set_option('server.maxUploadSize', 500)
 
 # Set Streamlit page configuration
 st.set_page_config(
