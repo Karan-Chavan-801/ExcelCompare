@@ -9,12 +9,10 @@ from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 import plotly.express as px
 import math
 
-
 # ---------------------- Configuration ---------------------- #
 
 # Replace with your FastAPI backend URL
 API_BASE_URL = 'https://api.demopython.in/'  # Update this if your backend is hosted elsewhere
-
 
 # Set Streamlit page configuration
 st.set_page_config(
@@ -79,7 +77,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
 # ---------------------- Initialize Session State ---------------------- #
 if 'session_id' not in st.session_state:
     st.session_state['session_id'] = None
@@ -112,7 +109,8 @@ with col1:
 
 with col2:
     st.subheader("Upload Dashboard Excel/CSV")
-    dashboard_file = st.file_uploader("Upload Dashboard File", type=['csv', 'xls', 'xlsx', 'xlsb'], key='dashboard_file')
+    dashboard_file = st.file_uploader("Upload Dashboard File", type=['csv', 'xls', 'xlsx', 'xlsb'],
+                                      key='dashboard_file')
 
 # Upload Files Button
 if st.button("Upload Files"):
@@ -164,10 +162,12 @@ if st.session_state['date_ranges']:
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("**API File Date Range**")
-        st.write(f"From **{date_ranges.get('date_range_api', {}).get('min_date', 'N/A')}** to **{date_ranges.get('date_range_api', {}).get('max_date', 'N/A')}**")
+        st.write(
+            f"From **{date_ranges.get('date_range_api', {}).get('min_date', 'N/A')}** to **{date_ranges.get('date_range_api', {}).get('max_date', 'N/A')}**")
     with col2:
         st.markdown("**Dashboard File Date Range**")
-        st.write(f"From **{date_ranges.get('date_range_dashboard', {}).get('min_date', 'N/A')}** to **{date_ranges.get('date_range_dashboard', {}).get('max_date', 'N/A')}**")
+        st.write(
+            f"From **{date_ranges.get('date_range_dashboard', {}).get('min_date', 'N/A')}** to **{date_ranges.get('date_range_dashboard', {}).get('max_date', 'N/A')}**")
 
 # ---------------------- Step 3: Process Data ---------------------- #
 st.header("Process Data")
@@ -215,31 +215,49 @@ if st.session_state['data_processed']:
 
     with st.spinner('Fetching summary...'):
         try:
+            # Fetch the summary from /summary endpoint
             summary_response = requests.get(f"{API_BASE_URL}/summary", params={'session_id': session_id})
             if summary_response.status_code == 200:
                 summary = summary_response.json()
 
-                # Key Metrics
+                # Fetch the status counts from /status_counts endpoint
+                status_counts_response = requests.get(f"{API_BASE_URL}/status_counts",
+                                                      params={'session_id': session_id})
+                if status_counts_response.status_code == 200:
+                    status_counts = status_counts_response.json()
+                    status_counts_api = status_counts.get('status_counts_api', {})
+                    status_counts_dashboard = status_counts.get('status_counts_dashboard', {})
+                else:
+                    st.error(f"Failed to fetch status counts: {status_counts_response.json().get('detail', '')}")
+                    status_counts_api = {}
+                    status_counts_dashboard = {}
+
+                # Display Key Metrics
                 st.markdown("### Key Metrics")
                 col1, col2, col3 = st.columns(3)
                 with col1:
                     st.metric(label="Total Amount (API)", value=f"₹{summary.get('total_amount_api', 0):,.2f}")
                 with col2:
-                    st.metric(label="Total Amount (Dashboard)", value=f"₹{summary.get('total_amount_dashboard', 0):,.2f}")
+                    st.metric(label="Total Amount (Dashboard)",
+                              value=f"₹{summary.get('total_amount_dashboard', 0):,.2f}")
                 with col3:
                     amount_diff = summary.get('total_amount_difference', 0)
                     delta_color = "normal" if amount_diff >= 0 else "inverse"
-                    st.metric(label="Amount Difference", value=f"₹{amount_diff:,.2f}", delta="", delta_color=delta_color)
+                    st.metric(label="Amount Difference", value=f"₹{amount_diff:,.2f}", delta="",
+                              delta_color=delta_color)
 
                 col4, col5, col6 = st.columns(3)
                 with col4:
                     st.metric(label="Transactions (API)", value=f"{summary.get('num_transactions_api', 0):,}")
                 with col5:
-                    st.metric(label="Transactions (Dashboard)", value=f"{summary.get('num_transactions_dashboard', 0):,}")
+                    st.metric(label="Transactions (Dashboard)",
+                              value=f"{summary.get('num_transactions_dashboard', 0):,}")
                 with col6:
-                    transaction_diff = summary.get('num_transactions_api', 0) - summary.get('num_transactions_dashboard', 0)
+                    transaction_diff = summary.get('num_transactions_api', 0) - summary.get(
+                        'num_transactions_dashboard', 0)
                     delta_color = "normal" if transaction_diff >= 0 else "inverse"
-                    st.metric(label="Transaction Difference", value=f"{transaction_diff:,}", delta="", delta_color=delta_color)
+                    st.metric(label="Transaction Difference", value=f"{transaction_diff:,}", delta="",
+                              delta_color=delta_color)
 
                 col7, col8 = st.columns(2)
                 with col7:
@@ -247,7 +265,28 @@ if st.session_state['data_processed']:
                 with col8:
                     st.metric(label="Uncommon OrderIDs", value=f"{summary.get('num_uncommon_orderids', 0):,}")
 
-                # Visual Separators
+                # Display Status Counts
+                st.markdown("### Status Counts")
+                col9, col10 = st.columns(2)
+                with col9:
+                    st.markdown("**API Status Counts**")
+                    if status_counts_api:
+                        status_counts_api_df = pd.DataFrame(list(status_counts_api.items()),
+                                                            columns=['Status', 'Count'])
+                        st.table(status_counts_api_df)
+                    else:
+                        st.write("No status counts available for API data.")
+                with col10:
+                    st.markdown("**Dashboard Status Counts**")
+                    if status_counts_dashboard:
+                        status_counts_dashboard_df = pd.DataFrame(list(status_counts_dashboard.items()),
+                                                                  columns=['Status', 'Count'])
+                        st.table(status_counts_dashboard_df)
+                    else:
+                        st.write("No status counts available for Dashboard data.")
+
+                
+                # Visual Separator
                 st.markdown("---")
 
                 # Date Ranges (Already displayed in Step 2)
@@ -258,6 +297,7 @@ if st.session_state['data_processed']:
 
     # ---------------------- Fetch and Display Dataframes with Custom Pagination ---------------------- #
     st.header("Processed Data Comparison")
+
 
     def fetch_dataframe(session_id, endpoint, page, page_size):
         try:
@@ -273,6 +313,7 @@ if st.session_state['data_processed']:
         except Exception as e:
             st.error(f"An error occurred while fetching data from {endpoint}: {e}")
             return None
+
 
     def display_data_with_aggrid(session_id, endpoint, title, pagination_key):
         st.subheader(title)
@@ -304,7 +345,7 @@ if st.session_state['data_processed']:
                     gridOptions=grid_options,
                     height=400,  # Adjust height as needed
                     width='100%',
-                    #fit_columns_on_grid_load=True,
+                    # fit_columns_on_grid_load=True,
                     theme='balham',
                     enable_enterprise_modules=True,
                     update_mode=GridUpdateMode.NO_UPDATE,
@@ -323,6 +364,7 @@ if st.session_state['data_processed']:
                     if st.button("Next", key=f"{endpoint}_next"):
                         if current_page < total_pages:
                             st.session_state[pagination_key]['page'] += 1
+
 
     # Display API Data
     col1, col2 = st.columns(2)
@@ -495,7 +537,8 @@ if st.session_state['data_processed']:
 
                 # Convert to DataFrame for Plotly
                 status_counts_api_df = pd.DataFrame(list(status_counts_api.items()), columns=['Status', 'Count'])
-                status_counts_dashboard_df = pd.DataFrame(list(status_counts_dashboard.items()), columns=['Status', 'Count'])
+                status_counts_dashboard_df = pd.DataFrame(list(status_counts_dashboard.items()),
+                                                          columns=['Status', 'Count'])
 
                 # Plot Pie Charts
                 st.subheader("Status Distribution")
@@ -527,7 +570,8 @@ if st.session_state['data_processed']:
     # Fetch total amount per status
     with st.spinner('Fetching total amount per status...'):
         try:
-            amount_per_status_response = requests.get(f"{API_BASE_URL}/total_amount_per_status", params={'session_id': session_id})
+            amount_per_status_response = requests.get(f"{API_BASE_URL}/total_amount_per_status",
+                                                      params={'session_id': session_id})
             if amount_per_status_response.status_code == 200:
                 amount_per_status = amount_per_status_response.json()
                 amount_per_status_api = amount_per_status.get('total_amount_per_status_api', [])
@@ -562,7 +606,8 @@ if st.session_state['data_processed']:
                     )
                     st.plotly_chart(fig_dashboard_bar, use_container_width=True)
             else:
-                st.error(f"Failed to fetch total amount per status: {amount_per_status_response.json().get('detail', '')}")
+                st.error(
+                    f"Failed to fetch total amount per status: {amount_per_status_response.json().get('detail', '')}")
         except Exception as e:
             st.error(f"An error occurred while fetching total amount per status: {e}")
 
@@ -579,9 +624,9 @@ if st.session_state['data_processed']:
     st.markdown(f"[Download Status Differences CSV]({status_diff_url})")
     st.markdown(f"[Download Uncommon OrderIDs CSV]({uncommon_orderids_url})")
 
-   # ---------------------- Search Functionality ---------------------- #
+    # ---------------------- Search Functionality ---------------------- #
     st.header("Search for OrderID")
-    
+
     orderid_to_search = st.text_input("Enter OrderID to search")
 
     if st.button("Search") and orderid_to_search:
@@ -605,7 +650,7 @@ if st.session_state['data_processed']:
                             api_matches_df,
                             gridOptions=grid_options,
                             height=150,  # Increased height
-                            #fit_columns_on_grid_load=True,
+                            # fit_columns_on_grid_load=True,
                             theme='balham'  # Use 'balham' to match dark theme
                         )
                     else:
@@ -623,7 +668,7 @@ if st.session_state['data_processed']:
                             dashboard_matches_df,
                             gridOptions=grid_options,
                             height=150,  # Increased height
-                            #fit_columns_on_grid_load=True,
+                            # fit_columns_on_grid_load=True,
                             theme='balham'  # Use 'balham' to match dark theme
                         )
                     else:
