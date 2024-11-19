@@ -336,7 +336,7 @@ if st.session_state['data_processed']:
             else:
                 # Configure AgGrid options
                 gb = GridOptionsBuilder.from_dataframe(df)
-                gb.configure_side_bar()
+                #gb.configure_side_bar()
                 gb.configure_default_column(resizable=True, filterable=True, sortable=True)
                 grid_options = gb.build()
 
@@ -344,7 +344,7 @@ if st.session_state['data_processed']:
                 AgGrid(
                     df,
                     gridOptions=grid_options,
-                    height=400,  # Adjust height as needed
+                    height=500,  # Adjust height as needed
                     width='100%',
                     # fit_columns_on_grid_load=True,
                     theme='balham',
@@ -650,7 +650,7 @@ if st.session_state['data_processed']:
                         AgGrid(
                             api_matches_df,
                             gridOptions=grid_options,
-                            height=150,  # Increased height
+                            height=250,  # Increased height
                             # fit_columns_on_grid_load=True,
                             theme='balham'  # Use 'balham' to match dark theme
                         )
@@ -668,7 +668,7 @@ if st.session_state['data_processed']:
                         AgGrid(
                             dashboard_matches_df,
                             gridOptions=grid_options,
-                            height=150,  # Increased height
+                            height=250,  # Increased height
                             # fit_columns_on_grid_load=True,
                             theme='balham'  # Use 'balham' to match dark theme
                         )
