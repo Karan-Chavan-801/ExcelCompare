@@ -336,6 +336,7 @@ if st.session_state['data_processed']:
             else:
                 # Configure AgGrid options
                 gb = GridOptionsBuilder.from_dataframe(df)
+                gb.configure_side_bar()
                 gb.configure_default_column(resizable=True, filterable=True, sortable=True)
                 grid_options = gb.build()
 
@@ -347,9 +348,9 @@ if st.session_state['data_processed']:
                     width='100%',
                     # fit_columns_on_grid_load=True,
                     theme='balham',
-                    #enable_enterprise_modules=True,
-                    #update_mode=GridUpdateMode.NO_UPDATE,
-                    #allow_unsafe_jscode=True,
+                   # enable_enterprise_modules=True,
+                   # update_mode=GridUpdateMode.NO_UPDATE,
+                   # allow_unsafe_jscode=True,
                 )
 
                 # Display pagination controls
