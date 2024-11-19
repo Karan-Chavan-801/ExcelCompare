@@ -347,9 +347,9 @@ if st.session_state['data_processed']:
                     width='100%',
                     # fit_columns_on_grid_load=True,
                     theme='balham',
-                    enable_enterprise_modules=True,
-                    update_mode=GridUpdateMode.NO_UPDATE,
-                    allow_unsafe_jscode=True,
+                    #enable_enterprise_modules=True,
+                    #update_mode=GridUpdateMode.NO_UPDATE,
+                    #allow_unsafe_jscode=True,
                 )
 
                 # Display pagination controls
